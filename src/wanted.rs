@@ -36,6 +36,23 @@ pub async fn get_wanteds(
     Ok(wanteds.into())
 }
 
+#[get("/wanted/{id}")]
+pub async fn get_wanted(
+    #[data] pool: PgPool,
+    id: i32,
+    _query: Query<GetWantedsQuery>,
+) -> WebResult<Wanted> {
+    let mut pool = pool;
+    let wanted: Wanted = query_as!(Wanted, "SELECT * FROM wanteds WHERE id = $1", id)
+        .fetch_one(&mut pool)
+        .await
+        .ok()
+        .with_context(|| format!("Getting wanted {}", id))
+        .map_err(AnyhowError)
+        .map_err(reject::custom)?;
+    Ok(wanted.into())
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateWanted {
     title: String,

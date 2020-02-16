@@ -9,9 +9,9 @@ mod warp_rejection;
 #[tokio::main]
 async fn main() -> Result<()> {
     if env::var_os("RUST_LOG").is_none() {
-        // Set `RUST_LOG=todos=debug` to see debug logs,
+        // Set `RUST_LOG=web=debug` to see debug logs,
         // this only shows access logs.
-        env::set_var("RUST_LOG", "todos=info,warn");
+        env::set_var("RUST_LOG", "web=info,warn");
     }
     pretty_env_logger::init();
 
@@ -21,9 +21,10 @@ async fn main() -> Result<()> {
     .await?;
     serve(
         wanted::get_wanteds(pool.clone())
+            .or(wanted::get_wanted(pool.clone()))
             .or(wanted::post_wanted(pool))
             .or(get().and(warp::fs::dir("static/")))
-            .with(rweb::log("todos"))
+            .with(rweb::log("web"))
             .recover(warp_rejection::handle_rejection),
     )
     .run(([127, 0, 0, 1], 3030))
