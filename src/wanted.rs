@@ -36,7 +36,7 @@ pub async fn get_wanteds(
     Ok(wanteds.into())
 }
 
-#[get("/wanted/{id}")]
+#[get("/wanteds/{id}")]
 pub async fn get_wanted(
     #[data] pool: PgPool,
     id: i32,
@@ -47,7 +47,7 @@ pub async fn get_wanted(
         .fetch_one(&mut pool)
         .await
         .ok()
-        .with_context(|| format!("Getting wanted {}", id))
+        .with_context(|| format!("Couldn't find {}", id))
         .map_err(AnyhowError)
         .map_err(reject::custom)?;
     Ok(wanted.into())
