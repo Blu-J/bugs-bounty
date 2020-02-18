@@ -3,6 +3,7 @@ use rweb::*;
 use sqlx::PgPool;
 use std::env;
 
+mod users;
 mod wanted;
 mod warp_rejection;
 
@@ -22,7 +23,10 @@ async fn main() -> Result<()> {
     serve(
         wanted::get_wanteds(pool.clone())
             .or(wanted::get_wanted(pool.clone()))
-            .or(wanted::post_wanted(pool))
+            .or(wanted::post_wanted(pool.clone()))
+            .or(users::get_user(pool.clone()))
+            .or(users::get_users(pool.clone()))
+            .or(users::post_user(pool))
             .or(get().and(warp::fs::dir("static/")))
             .with(rweb::log("web"))
             .recover(warp_rejection::handle_rejection),

@@ -30,11 +30,11 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
             status: format!("{}", status_code),
             message: format!("{}", err),
         }
-    } else if let Some(_) = err.find::<rweb::reject::MethodNotAllowed>() {
+    } else if let Some(method_not_allow) = err.find::<rweb::reject::MethodNotAllowed>() {
         status_code = StatusCode::METHOD_NOT_ALLOWED;
         ErrorMessage {
             status: format!("{}", status_code),
-            message: "404".into(),
+            message: format!("404: {}", method_not_allow),
         }
     } else {
         error!("unhandled rejection: {:?}", err);
